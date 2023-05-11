@@ -8,7 +8,7 @@ export default function DisplayClassroom() {
   const { id } = useParams();
   //==================================
   //REFRESH TIMER HERE -> Change to desired amount, in seconds
-  const [countdown, setCountdown] = useState(120);
+  const [countdown, setCountdown] = useState(import.meta.env.VITE_BASE_URL);
   //==================================
   const calDisplayLogic = calendarDisplayLogic();
   //   useEffect(() => {
