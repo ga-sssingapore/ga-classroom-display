@@ -21,13 +21,15 @@ const PORT = process.env.PORT ?? 3000;
 //MIDDLEWARE
 app.use(express.static("../client/dist"));
 app.use(express.json());
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-access-token"],
-  })
-);
+
+app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,PUT,POST,DELETE,PATCH");
+  res.header("Access-Control-Allow-Headers", "Origin,X-Requested-With,Content-Type,Accept,Authorization");
+  next()
+}
+
 app.use(morgan("dev"));
 app.use("/auth", authRoutes);
 app.use("/api/bookings", bookingsController);
