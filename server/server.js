@@ -35,12 +35,11 @@ app.use("/api/cohorts", cohortsController);
 app.use("/api/users", usersController);
 
 // Connect to Mongo
-const mongoURI = process.env.SECRET_KEY;
 const db = mongoose.connection;
 mongoose.set("runValidators", true); // here is your global setting
 mongoose.set("strictQuery", false);
 mongoose.set("debug", true);
-mongoose.connect(mongoURI);
+mongoose.connect(process.env.MONGO_URI);
 
 // Connection Error/Success
 db.on("error", (err) => console.log(err.message + " is mongod not running?"));
