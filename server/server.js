@@ -35,16 +35,16 @@ app.use("/api/cohorts", cohortsController);
 app.use("/api/users", usersController);
 
 // Connect to Mongo
-const mongoURI = mongoose.set("runValidators", true); // here is your global setting
+const mongoURI = process.env.MONGO_URI;
+const db = mongoose.connection;
+mongoose.set("runValidators", true); // here is your global setting
 mongoose.set("strictQuery", false);
 mongoose.set("debug", true);
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(mongoURI);
 
 // Connection Error/Success
 db.on("error", (err) => console.log(err.message + " is mongod not running?"));
-db.on("connected", () =>
-  console.log("mongo connected: ", process.env.MONGO_URI)
-);
+db.on("connected", () => console.log("mongo connected: ", mongoURI));
 db.on("disconnected", () => console.log("mongo disconnected"));
 
 app.get("/api/", (req, res) => {
@@ -57,7 +57,7 @@ app.get("*", (req, res) => {
 
 //Listener
 db.once("open", () => {
-  console.log("connected to mongo", process.env.MONGO_URI);
+  console.log("connected to mongo", mongoURI);
   app.listen(PORT, () => {
     console.log("listening on port", PORT);
   });
