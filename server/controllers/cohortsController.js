@@ -1,26 +1,10 @@
 const express = require("express");
-// const session = require("express-session");
 const router = express.Router();
 const Cohort = require("../models/cohort");
-const seed = require("../seed/seedCohort");
 const moment = require("moment");
 const Booking = require("../models/booking");
 
-// session
-
-// router.use(
-//   session({
-//     secret: process.env.SECRET,
-//     resave: false,
-//     saveUninitialized: true,
-//     // cookie: { secure: true },
-//   })
-// );
-
-// router.get("/seed", seed); // DELETE!
-
 router.get("/", async (req, res) => {
-  //? return [ list of cohorts]
   try {
     console.log(req);
     const cohorts = await Cohort.find().exec();
@@ -31,8 +15,8 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/bookings/:classroom", async (req, res) => {
-  // const currDate = moment().startOf("day");
-  const currDate = moment("2023-5-20").startOf("day");
+  const currDate = moment().startOf("day");
+  // const currDate = moment("2023-5-20").startOf("day");
 
   // ignore on Sunday
   if (currDate.day() === 0) {
