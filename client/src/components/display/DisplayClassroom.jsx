@@ -11,19 +11,16 @@ export default function DisplayClassroom() {
   const [countdown, setCountdown] = useState(120);
   //==================================
   const calDisplayLogic = calendarDisplayLogic();
-  //   useEffect(() => {
-  // console.log(calDisplayLogic);
-  //   }, []);
 
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCountdown((countdown) => countdown - 1);
-        if (countdown === 0) {
-          window.location.reload();
-        }
-      }, 1000);
-      return () => clearInterval(interval);
-    }, [countdown, calDisplayLogic]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountdown((countdown) => countdown - 1);
+      if (countdown === 0) {
+        window.location.reload();
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [countdown, calDisplayLogic]);
 
   const [cohortState, setCohortState] = useState([]);
 
@@ -31,11 +28,9 @@ export default function DisplayClassroom() {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/api/cohorts`
-        // `/api/cohorts`
       );
       if (response) {
         setCohortState(response);
-        // console.log(response);
       }
     } catch (error) {
       console.log(error.message);
@@ -44,18 +39,14 @@ export default function DisplayClassroom() {
   useEffect(() => {
     fetchCohort();
   }, []);
-  // console.log(cohortState);
-  const [bookingsState, setBookingsState] = useState([]);
 
   const fetchBooking = async () => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/api/bookings`
-        // `/api/bookings`
       );
       if (response) {
         setBookingsState(response);
-        // console.log(response);
       }
     } catch (error) {
       console.log(error.message);
@@ -67,44 +58,30 @@ export default function DisplayClassroom() {
 
   let classRoomUser = calDisplayLogic[id - 1]?.[0];
 
-  //   let bookingsStateFilter = bookingsState?.filter(
-  //     (ele) => ele.roomUseBy === classRoomUser
-  //   );
-
   let cohortStateFilter = Array.isArray(cohortState.data)
     ? cohortState.data.filter((ele) => ele.courseCode === classRoomUser)
     : [];
-  // console.log(cohortStateFilter);
   let cohortStartTime = cohortStateFilter[0]?.startTime;
   let cohortEndTime = cohortStateFilter[0]?.endTime;
 
-  const splitCurrUserArray = calDisplayLogic[id - 1]?.[0].split("/")
-console.log("SPLIT", splitCurrUserArray)
-  // console.log(cohortStartTime);
-  // console.log(cohortEndTime);
+  const splitCurrUserArray = calDisplayLogic[id - 1]?.[0].split("/");
+  console.log("SPLIT", splitCurrUserArray);
 
   return (
     <div className=" h-screen w-screen bg-black py-[5vh] flex flex-col">
       <div className=" h-[40vh] min-w-[50%] flex whitespace-nowrap">
         <h1 className=" text-6xl text text-white m-auto">CLASSROOM {id}</h1>
       </div>
-      {/* <hr className=" border-white border-2 w-[70vw] m-auto" /> */}
       <div className=" flex flex-col items-center">
-        {/* <h2 className="text-7xl text-center text-white ">
-          {calDisplayLogic[id - 1]?.[0]}
-        </h2> */}
-        {splitCurrUserArray.map((ele,index)=>(
-        <h2 className="text-7xl text-center text-white px-10 my-2 ">
-          {ele}
-        </h2>))}
+        {splitCurrUserArray.map((ele, index) => (
+          <h2 className="text-7xl text-center text-white px-10 my-2 ">{ele}</h2>
+        ))}
         {cohortStartTime && cohortEndTime && (
           <p className="text-white text-5xl text-center pt-6">
             {cohortStartTime} - {cohortEndTime}
           </p>
         )}
-        {/* <p className="text-white text-center">
-          Placeholder: {countdown} seconds remaining until refresh.
-        </p> */}
+
         <br />
         <hr className=" border-white border-2 w-[70vw] m-auto mt-20 mb-20" />
         <br />
@@ -117,7 +94,6 @@ console.log("SPLIT", splitCurrUserArray)
                 e.target.src = fallbackLogo;
               }}
               className=" h-auto w-[60vw]"
-              //   style={{ width: 500, height: "auto" }}
               alt="GENERAL ASSEMBLY"
             />
           </Link>

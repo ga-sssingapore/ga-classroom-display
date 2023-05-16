@@ -9,7 +9,7 @@ import ProtectRoute from "./routes/ProtectRoute";
 import Bookings from "./protected/Bookings";
 import SingleBooking from "./protected/SingleBooking";
 import Display from "./pages/Display";
-import DisplayClassroom from "./components/display/DisplayClassroom";
+import DisplayClassroom from "./components/display/DisplayClassroom2";
 
 export default function App() {
   return (
@@ -31,8 +31,9 @@ export default function App() {
               <Route path="/admin/bookings/:id" element={<SingleBooking />} />
             </Route>
           </Route>
-          {/* No Navbar */}
-          <Route path="/display/:id" element={<DisplayClassroom />} />
+
+          {/* <Route path="/display/:id" element={<DisplayClassroom />} /> */}
+          <Route path="/display/:classroom" element={<DisplayClassroom />} />
         </Routes>
       </BrowserRouter>
     </SelectedDateProvider>
