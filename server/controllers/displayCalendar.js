@@ -90,7 +90,7 @@ router.post("/", async (req, res) => {
         dates[i].isBetween(
           dayjs(item.bookingStart),
           dayjs(item.bookingEnd),
-          "day",
+          "date",
           "[]"
         )
       ) {
