@@ -11,15 +11,15 @@ dayjs.extend(isBetween);
 
 router.post("/", async (req, res) => {
   const currDate = dayjs().startOf("date");
-  // const deleteCohorts = await Cohort.find();
-  // for (const item of deleteCohorts) {
-  //   if (currDate.isAfter(item.endDate, "date")) await item.delete();
-  // }
+  const deleteCohorts = await Cohort.find();
+  for (const item of deleteCohorts) {
+    if (currDate.isAfter(item.endDate, "date")) await item.delete();
+  }
 
-  // const deleteBookings = await Booking.find();
-  // for (const item of deleteBookings) {
-  //   if (currDate.isAfter(item.bookingEnd, "date")) await item.delete();
-  // }
+  const deleteBookings = await Booking.find();
+  for (const item of deleteBookings) {
+    if (currDate.isAfter(item.bookingEnd, "date")) await item.delete();
+  }
 
   const datesString = req.body;
   const dates = datesString.map((item) => dayjs(item));
@@ -49,8 +49,10 @@ router.post("/", async (req, res) => {
       const endDate = dayjs(item.endDate);
 
       if (dates[i].isBetween(startDate, endDate, "date", "[]")) {
+        // since only fulltime has days on campus. check fulltime first
         if (daysOnCampus.includes(dates[i].day())) {
           classes[item.classRoom - 1][i + 1] = item.courseCode;
+          // if the date to query is a sat and schedule is parttime
         } else if (dates[i].day() === 6 && item.courseSchedule === "PartTime") {
           if (
             dates[i].isSame(startDate, "date") ||
