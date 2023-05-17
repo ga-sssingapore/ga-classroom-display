@@ -81,7 +81,7 @@ router.get("/bookings/:classroom", async (req, res) => {
 
   if (currDate.day() === 6) {
     const temp = await Cohort.find({
-      courseSchedule: "PartTime",
+      courseSchedule: { $ne: "none" },
       classRoom: req.params.classroom,
     });
 

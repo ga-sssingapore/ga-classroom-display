@@ -26,11 +26,9 @@ export default function CourseTable() {
     try {
       const { data: response } = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/api/cohorts`
-        // `/api/cohorts`
       );
       if (response) {
         setCourses(response);
-        // console.log(response);
       }
     } catch (error) {
       console.log(error.message);
@@ -63,7 +61,6 @@ export default function CourseTable() {
       console.log(error.message);
       // return setOpen(true); //open FailMsg
     }
-
   };
   //======================================================
   // Sorting Filtered Courses
@@ -291,7 +288,9 @@ export default function CourseTable() {
                                       📝
                                     </Link>
                                     <button
-                                      onClick={()=>handleDelete(course._id, i)}
+                                      onClick={() =>
+                                        handleDelete(course._id, i)
+                                      }
                                     >
                                       X
                                     </button>
@@ -300,8 +299,6 @@ export default function CourseTable() {
                               </tr>
                             </>
                           ))}
-
-                      
                       </tbody>
                     </table>
                   </div>

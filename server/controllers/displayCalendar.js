@@ -53,7 +53,7 @@ router.post("/", async (req, res) => {
         if (daysOnCampus.includes(dates[i].day())) {
           classes[item.classRoom - 1][i + 1] = item.courseCode;
           // if the date to query is a sat and schedule is parttime
-        } else if (dates[i].day() === 6 && item.courseSchedule === "PartTime") {
+        } else if (dates[i].day() === 6 && item.altSaturdays !== "none") {
           if (
             dates[i].isSame(startDate, "date") ||
             dates[i].isSame(endDate, "date")
