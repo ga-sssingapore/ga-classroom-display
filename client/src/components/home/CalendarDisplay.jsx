@@ -8,12 +8,15 @@ export default function CalendarDisplay() {
   const [dateHeaderRow, setDateHeaderRow] = useState([]);
   const [dayHeaderRow, setDayHeaderRow] = useState([]);
   const [displayClasses, setDisplayClasses] = useState([[], []]);
+  const [selectedDate, setSelectedDate] = useState(
+    moment().format("YYYY-MM-DD")
+  );
 
-  const createDateHeaderRow = (datesRow) => {
+  const createDateHeaderRow = () => {
     // get dates for today and next 6 days
     const dateRow = [];
     for (let i = 0; i < 7; i++) {
-      const thisDate = moment().startOf("day").add(i, "d");
+      const thisDate = moment(selectedDate).startOf("day").add(i, "d");
       dateRow.push(thisDate);
     }
 
@@ -115,7 +118,7 @@ export default function CalendarDisplay() {
     const dates = createDateHeaderRow();
     createDayHeaderRow(dates);
     createClassCalendar(dates);
-  }, []);
+  }, [selectedDate]);
 
   return (
     <>
@@ -123,11 +126,12 @@ export default function CalendarDisplay() {
         <div className=" text-lg flex flex-col justify-center items-center">
           <div className="pb-1">Date</div>
 
-          {/* <input
+          <input
             type="date"
-            defaultValue={DateTime.now().toFormat("yyyy-MM-dd")}
-            onChange={(e) => useSelectedDate.setSelectedDate(e.target.value)}
-          ></input> */}
+            value={selectedDate}
+            // defaultValue={moment().format("YYYY-MM-DD")}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          ></input>
         </div>
         <div className="mt-8 flex flex-col items-center">
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
