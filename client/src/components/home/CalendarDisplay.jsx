@@ -52,121 +52,89 @@ export default function CalendarDisplay() {
   }, [selectedDate]);
 
   return (
-    <>
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className=" text-lg flex flex-col justify-center items-center">
-          <div className="pb-1">Date</div>
+    <div className="px-4 sm:px-6 lg:px-8">
+      <div className=" text-lg flex flex-col justify-center items-center">
+        <div className="pb-1">Date</div>
 
-          <input
-            type="date"
-            value={selectedDate}
-            // defaultValue={moment().format("YYYY-MM-DD")}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          ></input>
-        </div>
-        <div className="mt-8 flex flex-col items-center">
-          <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-              <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <table className="min-w-full divide-y divide-gray-300">
-                  <thead className="bg-gray-50">
-                    <tr className=" bg-gray-400">
-                      <th scope="colgroup" colSpan={8}>
-                        Timetable
-                      </th>
-                    </tr>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        ></input>
+      </div>
+      <div className="mt-8 flex flex-col items-center">
+        <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-300">
+                <thead className="bg-gray-50">
+                  <tr className=" bg-gray-400">
+                    <th scope="colgroup" colSpan={8}>
+                      Timetable
+                    </th>
+                  </tr>
 
-                    <tr className="divide-x divide-gray-300">
+                  <tr className="divide-x divide-gray-300">
+                    <th scope="col" className="bg-gray-300 text-lg" rowSpan={2}>
+                      Classroom
+                    </th>
+
+                    {dateHeaderRow.map((item) => (
                       <th
+                        key={item.format("DDMMMYYYY")}
                         scope="col"
-                        className="bg-gray-300 text-lg"
-                        rowSpan={2}
+                        className=" bg-gray-200 py-1.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
                       >
-                        Classroom
+                        {item.format("DD MMM YYYY")}
                       </th>
-
-                      {dateHeaderRow.map((item) => (
-                        <th
-                          key={item.format("DDMMMYYYY")}
-                          scope="col"
-                          className=" bg-gray-200 py-1.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {item.format("DD MMM YYYY")}
-                        </th>
-                      ))}
-                    </tr>
-                    <tr className="divide-x divide-gray-300">
-                      {dayHeaderRow.map((item) => (
-                        <th
-                          key={item}
-                          scope="col"
-                          className="text-center py-1.5 pl-4 pr-4 text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {item}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-x divide-gray-300 bg-white">
-                    {calendar.map((row, index) => (
-                      <tr key={index} className="divide-x divide-gray-300">
-                        <td
-                          key={Math.random()}
-                          className="text-left text-sm font-semibold bg-gray-200 text-gray-900 sm:pl-6"
-                        >
-                          <Link to={`/display/${row[0]}`}>Room {row[0]}</Link>
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[1]}
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[2]}
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[3]}
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[4]}
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[5]}
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[6]}
-                        </td>
-                        <td
-                          key={Math.random()}
-                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                        >
-                          {row[7]}
-                        </td>
-                      </tr>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                  </tr>
+                  <tr className="divide-x divide-gray-300">
+                    {dayHeaderRow.map((item) => (
+                      <th
+                        key={item}
+                        scope="col"
+                        className="text-center py-1.5 pl-4 pr-4 text-sm font-semibold text-gray-900 sm:pl-6"
+                      >
+                        {item}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-x divide-gray-300 bg-white">
+                  {calendar.map((row, index) => (
+                    <tr key={index} className="divide-x divide-gray-300">
+                      {row.map((item, idx) => {
+                        if (idx === 0) {
+                          return (
+                            <td
+                              key={Math.random()}
+                              className="text-left text-sm font-semibold bg-gray-200 text-gray-900 sm:pl-6"
+                            >
+                              <Link to={`/display/${row[0]}`}>
+                                Room {row[0]}
+                              </Link>
+                            </td>
+                          );
+                        } else {
+                          return (
+                            <td
+                              key={Math.random()}
+                              className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                            >
+                              {row[idx]}
+                            </td>
+                          );
+                        }
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
