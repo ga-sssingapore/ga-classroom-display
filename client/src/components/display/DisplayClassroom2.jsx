@@ -37,7 +37,6 @@ export default function DisplayClassroom() {
         `${import.meta.env.VITE_BASE_URL}/api/cohorts/bookings/${classroom}`
       );
       if (response) {
-        console.log(response);
         setDisplay(response.data);
       }
     } catch (error) {
@@ -46,7 +45,6 @@ export default function DisplayClassroom() {
   };
 
   useEffect(() => {
-    console.log("run");
     getDisplay();
   }, []);
 

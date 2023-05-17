@@ -1,8 +1,6 @@
 const express = require("express");
-// const session = require("express-session");
 const router = express.Router();
 const Booking = require("../models/booking");
-// const seed = require("../seed/seedBooking");
 
 router.get("/", async (req, res) => {
   try {

@@ -1,12 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const Cohort = require("../models/cohort");
-const moment = require("moment");
 const Booking = require("../models/booking");
+
+const dayjs = require("dayjs");
+const customParseFormat = require("dayjs/plugin/customParseFormat");
+dayjs.extend(customParseFormat);
+const isBetween = require("dayjs/plugin/isBetween");
+dayjs.extend(isBetween);
 
 router.get("/", async (req, res) => {
   try {
-    console.log(req);
     const cohorts = await Cohort.find().exec();
     res.json(cohorts);
   } catch (error) {
@@ -15,10 +19,11 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/bookings/:classroom", async (req, res) => {
-  const currDate = moment().startOf("day");
+  const currDate = dayjs().startOf("date");
+  console.log({ currDate });
 
   // ignore on Sunday
-  if (currDate.day() === 0) {
+  if (currDate.get("day") === 0) {
     return res.json({
       classroom: "",
       courseCode: "",
@@ -39,10 +44,10 @@ router.get("/bookings/:classroom", async (req, res) => {
   for (const item of bookingsClassroom) {
     if (
       currDate.isBetween(
-        moment(item.bookingStart),
-        moment(item.bookingEnd),
-        "day",
-        "[]"
+        dayjs(item.bookingStart),
+        dayjs(item.bookingEnd),
+        "date",
+        []
       )
     ) {
       returnValue = {
@@ -81,8 +86,8 @@ router.get("/bookings/:classroom", async (req, res) => {
     });
 
     for (const item of temp) {
-      const startDate = moment(item.startDate).startOf("day");
-      const endDate = moment(item.endDate).startOf("day");
+      const startDate = dayjs(item.startDate).startOf("date");
+      const endDate = dayjs(item.endDate).startOf("date");
 
       if (currDate.isSame(startDate) || currDate.isSame(endDate)) {
         returnValue = {
@@ -93,13 +98,13 @@ router.get("/bookings/:classroom", async (req, res) => {
           startTime: item.startTime,
           endTime: item.endTime,
         };
-      } else if (currDate.isBetween(startDate, endDate, "day")) {
+      } else if (currDate.isBetween(startDate, endDate, "date")) {
         let calculatedDate = currDate.clone();
         let weekCount = 1;
 
         while (calculatedDate.isAfter(startDate)) {
           weekCount++;
-          calculatedDate.subtract(7, "days");
+          calculatedDate.subtract(7, "day");
         }
 
         if (weekCount % 2 && item.altSaturdays === "odd") {
@@ -134,9 +139,9 @@ router.get("/bookings/:classroom", async (req, res) => {
     for (const item of cohortsClassroom) {
       if (
         currDate.isBetween(
-          moment(item.startDate),
-          moment(item.endDate),
-          "day",
+          dayjs(item.startDate),
+          dayjs(item.endDate),
+          "date",
           "[]"
         )
       ) {
@@ -164,7 +169,6 @@ router.get("/bookings/:classroom", async (req, res) => {
     };
   }
 
-  console.log(returnValue);
   res.json(returnValue);
 });
 
