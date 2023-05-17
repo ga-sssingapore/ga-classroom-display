@@ -11,8 +11,8 @@ const authRoutes = require("./routes/auth.js");
 // Import
 const bookingsController = require("./controllers/bookingsController.js");
 const cohortsController = require("./controllers/cohortsController.js");
-const User = require("./models/user.js");
 const usersController = require("./controllers/usersController.js");
+const displayCalendar = require("./controllers/displayCalendar.js");
 
 //Configuration
 const app = express();
@@ -33,6 +33,7 @@ app.use("/auth", authRoutes);
 app.use("/api/bookings", bookingsController);
 app.use("/api/cohorts", cohortsController);
 app.use("/api/users", usersController);
+app.use("/api/calendar", displayCalendar);
 
 // Connect to Mongo
 const mongoURI = process.env.MONGO_URI;

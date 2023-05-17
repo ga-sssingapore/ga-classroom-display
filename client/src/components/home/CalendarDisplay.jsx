@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useSelectedDate } from "../../context/SelectedDateContext";
 import moment from "moment";
 import axios from "axios";
 
 export default function CalendarDisplay() {
   const [dateHeaderRow, setDateHeaderRow] = useState([]);
   const [dayHeaderRow, setDayHeaderRow] = useState([]);
-  const [displayClasses, setDisplayClasses] = useState([[], []]);
+  const [calendar, setCalendar] = useState([[], []]);
   const [selectedDate, setSelectedDate] = useState(
     moment().format("YYYY-MM-DD")
   );
@@ -37,81 +36,13 @@ export default function CalendarDisplay() {
   };
 
   const createClassCalendar = async (dates) => {
-    const classes = [
-      ["1", "", "", "", "", "", "", ""],
-      ["2", "", "", "", "", "", "", ""],
-      ["3", "", "", "", "", "", "", ""],
-      ["4", "", "", "", "", "", "", ""],
-      ["5", "", "", "", "", "", "", ""],
-      ["6", "", "", "", "", "", "", ""],
-    ];
-
-    // cohorts
-    const cohorts = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/api/cohorts`
+    const datesString = dates.map((item) => moment(item).format("YYYY-MM-DD"));
+    const calendar = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/api/calendar`,
+      datesString
     );
 
-    for (const item of cohorts.data) {
-      const daysOnCampus = [];
-      if (item.daysOnCampus.monday) daysOnCampus.push(1);
-      if (item.daysOnCampus.tuesday) daysOnCampus.push(2);
-      if (item.daysOnCampus.wednesday) daysOnCampus.push(3);
-      if (item.daysOnCampus.thursday) daysOnCampus.push(4);
-      if (item.daysOnCampus.friday) daysOnCampus.push(5);
-
-      for (let i = 0; i < dates.length; i++) {
-        const startDate = moment(item.startDate);
-        const endDate = moment(item.endDate);
-
-        if (dates[i].isBetween(startDate, endDate, "day", "[]")) {
-          if (item.courseSchedule === "PartTime") {
-            if (dates[i].isSame(startDate) || dates[i].isSame(endDate)) {
-              classes[item.classRoom - 1][6] = item.courseCode;
-            } else {
-              let calculatedDate = dates[i].clone();
-              let weekCount = 1;
-
-              while (calculatedDate.isAfter(startDate)) {
-                weekCount++;
-                calculatedDate.subtract(7, "days");
-              }
-
-              if (dates[i].day() === 6) {
-                if (weekCount % 2 && item.altSaturdays === "odd") {
-                  classes[item.classRoom - 1][i + 1] = item.courseCode;
-                } else if (!(weekCount % 2) && item.altSaturdays === "even") {
-                  classes[item.classRoom - 1][i + 1] = item.courseCode;
-                }
-              }
-            }
-          } else if (daysOnCampus.includes(dates[i].day())) {
-            classes[item.classRoom - 1][i + 1] = item.courseCode;
-          }
-        }
-      }
-    }
-
-    // bookings
-    const bookings = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/api/bookings`
-    );
-
-    for (const item of bookings.data) {
-      for (let i = 0; i < dates.length; i++) {
-        if (
-          dates[i].isBetween(
-            moment(item.bookingStart),
-            moment(item.bookingEnd),
-            "day",
-            "[]"
-          )
-        ) {
-          classes[item.classRoom][i + 1] = item.roomUseBy;
-        }
-      }
-    }
-
-    setDisplayClasses(classes);
+    setCalendar(calendar.data);
   };
 
   useEffect(() => {
@@ -177,7 +108,7 @@ export default function CalendarDisplay() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-x divide-gray-300 bg-white">
-                    {displayClasses.map((row, index) => (
+                    {calendar.map((row, index) => (
                       <tr key={index} className="divide-x divide-gray-300">
                         <td
                           key={Math.random()}
