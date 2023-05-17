@@ -6,6 +6,17 @@ const Cohort = require("../models/cohort");
 const Booking = require("../models/booking");
 
 router.post("/", async (req, res) => {
+  const currDate = moment().startOf("d");
+  const deleteCohorts = await Cohort.find();
+  for (const item of deleteCohorts) {
+    if (currDate.isAfter(item.endDate)) item.delete();
+  }
+
+  const deleteBookings = await Booking.find();
+  for (const item of deleteBookings) {
+    if (currDate.isAfter(item.bookingEnd)) item.delete();
+  }
+
   const datesString = req.body;
   const dates = datesString.map((item) => moment(item));
 
