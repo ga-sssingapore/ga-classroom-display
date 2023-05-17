@@ -108,21 +108,19 @@ export default function CalendarDisplay() {
                         if (idx === 0) {
                           return (
                             <td
-                              key={Math.random()}
+                              key={`${index}-${idx}`}
                               className="text-left text-sm font-semibold bg-gray-200 text-gray-900 sm:pl-6"
                             >
-                              <Link to={`/display/${row[0]}`}>
-                                Room {row[0]}
-                              </Link>
+                              <Link to={`/display/${item}`}>Room {item}</Link>
                             </td>
                           );
                         } else {
                           return (
                             <td
-                              key={Math.random()}
+                              key={`${index}-${idx}`}
                               className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
                             >
-                              {row[idx]}
+                              {item}
                             </td>
                           );
                         }
