@@ -120,7 +120,7 @@ export default function CalendarDisplay() {
                               key={`${index}-${idx}`}
                               className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
                             >
-                              {item}
+                              {item ? item : <span>&nbsp;</span>}
                             </td>
                           );
                         }
