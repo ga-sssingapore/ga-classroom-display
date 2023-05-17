@@ -1,73 +1,133 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { DateTime } from "luxon";
 import { useSelectedDate } from "../../context/SelectedDateContext";
-import calendarDisplayLogic from "./DisplayLogic";
+import moment from "moment";
+import axios from "axios";
 
 export default function CalendarDisplay() {
-  const { dayHeaderRow, dateHeaderRow, selectedDate, setSelectedDate } =
-    useSelectedDate();
+  const [dateHeaderRow, setDateHeaderRow] = useState([]);
+  const [dayHeaderRow, setDayHeaderRow] = useState([]);
+  const [displayClasses, setDisplayClasses] = useState([[], []]);
 
-  //   console.log("CALDLOGIC", calendarDisplayLogic())
-  let calDisplayLogic = calendarDisplayLogic();
+  const createDateHeaderRow = (datesRow) => {
+    // get dates for today and next 6 days
+    const dateRow = [];
+    for (let i = 0; i < 7; i++) {
+      const thisDate = moment().startOf("day").add(i, "d");
+      dateRow.push(thisDate);
+    }
 
-  //Classroom array for mapping Display
-  const classrooms = [];
-  for (let i = 0; i < 6; i++) {
-    classrooms.push(`${i + 1}`);
-  }
-  //   console.log(classrooms)
+    setDateHeaderRow(dateRow);
+    return dateRow;
+  };
 
-  //   //Creating array of Weekdays to display **Days to display default "7", change code if necessary
-  //   const dayHeaderRow = [];
-  //   for (let i = 0; i < 7; i++) {
-  //     dayHeaderRow.push(
-  //       DateTime.fromISO(selectedDate).plus({ days: i }).toFormat("ccc")
-  //     );
-  //   }
-  //   //   console.log(dayHeaderRow);
-  //   //Creating array of Dates to display **Days to display default "7", change code if necessary
-  //   const dateHeaderRow = [];
-  //   for (let i = 0; i < 7; i++) {
-  //     dateHeaderRow.push(
-  //       DateTime.fromISO(selectedDate).plus({ days: i }).toFormat("d LLL yyyy")
-  //     );
-  //   }
-  //   console.log(dateHeaderRow);
+  const createDayHeaderRow = (dates) => {
+    // get the day of the week depending on the dateHeaderRow
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayRow = [];
+    for (let i = 0; i < 7; i++) {
+      const wordDay = days[dates[i].day()];
+      dayRow.push(wordDay);
+    }
 
-  //   useEffect(() => {
-  //     console.log(dayHeaderRow);
-  // console.log(selectedDate);
-  // console.log(DateTime.toLocaleString(DATE_MED));
-  //   }, [selectedDate]);
+    setDayHeaderRow(dayRow);
+  };
+
+  const createClassCalendar = async (dates) => {
+    const classes = [
+      ["1", "", "", "", "", "", "", ""],
+      ["2", "", "", "", "", "", "", ""],
+      ["3", "", "", "", "", "", "", ""],
+      ["4", "", "", "", "", "", "", ""],
+      ["5", "", "", "", "", "", "", ""],
+      ["6", "", "", "", "", "", "", ""],
+    ];
+
+    // cohorts
+    const cohorts = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/api/cohorts`
+    );
+
+    for (const item of cohorts.data) {
+      const daysOnCampus = [];
+      if (item.daysOnCampus.monday) daysOnCampus.push(1);
+      if (item.daysOnCampus.tuesday) daysOnCampus.push(2);
+      if (item.daysOnCampus.wednesday) daysOnCampus.push(3);
+      if (item.daysOnCampus.thursday) daysOnCampus.push(4);
+      if (item.daysOnCampus.friday) daysOnCampus.push(5);
+
+      for (let i = 0; i < dates.length; i++) {
+        const startDate = moment(item.startDate);
+        const endDate = moment(item.endDate);
+
+        if (dates[i].isBetween(startDate, endDate, "day", "[]")) {
+          if (item.courseSchedule === "PartTime") {
+            if (dates[i].isSame(startDate) || dates[i].isSame(endDate)) {
+              classes[item.classRoom - 1][6] = item.courseCode;
+            } else {
+              let calculatedDate = dates[i].clone();
+              let weekCount = 1;
+
+              while (calculatedDate.isAfter(startDate)) {
+                weekCount++;
+                calculatedDate.subtract(7, "days");
+              }
+
+              if (dates[i].day() === 6) {
+                if (weekCount % 2 && item.altSaturdays === "odd") {
+                  classes[item.classRoom - 1][i + 1] = item.courseCode;
+                } else if (!(weekCount % 2) && item.altSaturdays === "even") {
+                  classes[item.classRoom - 1][i + 1] = item.courseCode;
+                }
+              }
+            }
+          } else if (daysOnCampus.includes(dates[i].day())) {
+            classes[item.classRoom - 1][i + 1] = item.courseCode;
+          }
+        }
+      }
+    }
+
+    // bookings
+    const bookings = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/api/bookings`
+    );
+
+    for (const item of bookings.data) {
+      for (let i = 0; i < dates.length; i++) {
+        if (
+          dates[i].isBetween(
+            moment(item.bookingStart),
+            moment(item.bookingEnd),
+            "day",
+            "[]"
+          )
+        ) {
+          classes[item.classRoom][i + 1] = item.roomUseBy;
+        }
+      }
+    }
+
+    setDisplayClasses(classes);
+  };
+
+  useEffect(() => {
+    const dates = createDateHeaderRow();
+    createDayHeaderRow(dates);
+    createClassCalendar(dates);
+  }, []);
 
   return (
     <>
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* <div className="sm:flex sm:items-center"> */}
-        {/* <div className="sm:flex-auto"> */}
-        {/* <h1 className="text-xl font-semibold text-gray-900">Users</h1>
-            <p className="mt-2 text-sm text-gray-700">
-              A list of all the users in your account including their name, title, email and role.
-            </p> */}
-        {/* </div> */}
-        {/* <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-            >
-              Add user
-            </button>
-          </div> */}
-        {/* </div> */}
         <div className=" text-lg flex flex-col justify-center items-center">
           <div className="pb-1">Date</div>
 
-          <input
+          {/* <input
             type="date"
             defaultValue={DateTime.now().toFormat("yyyy-MM-dd")}
-            onChange={(e) => setSelectedDate(e.target.value)}
-          ></input>
+            onChange={(e) => useSelectedDate.setSelectedDate(e.target.value)}
+          ></input> */}
         </div>
         <div className="mt-8 flex flex-col items-center">
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -90,60 +150,81 @@ export default function CalendarDisplay() {
                         Classroom
                       </th>
 
-                      {dateHeaderRow.map((ele) => (
+                      {dateHeaderRow.map((item) => (
                         <th
+                          key={item.format("DDMMMYYYY")}
                           scope="col"
-                          key={ele}
                           className=" bg-gray-200 py-1.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
                         >
-                          {ele}
+                          {item.format("DD MMM YYYY")}
                         </th>
                       ))}
                     </tr>
                     <tr className="divide-x divide-gray-300">
-                      {dayHeaderRow.map((ele) => (
+                      {dayHeaderRow.map((item) => (
                         <th
+                          key={item}
                           scope="col"
-                          key={ele}
                           className="text-center py-1.5 pl-4 pr-4 text-sm font-semibold text-gray-900 sm:pl-6"
                         >
-                          {ele}
+                          {item}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-x divide-gray-300 bg-white">
-                    {classrooms.map((element, index) => (
-                      <tr
-                        key={`${element}+${index}`}
-                        className="divide-x divide-gray-300"
-                      >
-                        <td className="text-left text-sm font-semibold bg-gray-200 text-gray-900 sm:pl-6">
-                          <Link to={`/display/${element}`}>Room {element}</Link>
-                        </td>
-                        {calDisplayLogic[element - 1].map((ele, i) => (
-                          <td
-                            key={`${ele}+${i}`}
-                            className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
-                          >
-                            {ele}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                    {/* <tr className="divide-x divide-gray-200">
-                      <td className="text-left text-sm font-semibold bg-gray-200 text-gray-900 sm:pl-6">
-                        Classroom1
-                      </td>
-                      {calDisplayLogic[0].map((ele, i) => (
+                    {displayClasses.map((row, index) => (
+                      <tr key={index} className="divide-x divide-gray-300">
                         <td
-                          key={`${ele}+${i}`}
+                          key={Math.random()}
+                          className="text-left text-sm font-semibold bg-gray-200 text-gray-900 sm:pl-6"
+                        >
+                          <Link to={`/display/${row[0]}`}>Room {row[0]}</Link>
+                        </td>
+                        <td
+                          key={Math.random()}
                           className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
                         >
-                          {ele}
+                          {row[1]}
                         </td>
-                      ))}
-                    </tr> */}
+                        <td
+                          key={Math.random()}
+                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
+                          {row[2]}
+                        </td>
+                        <td
+                          key={Math.random()}
+                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
+                          {row[3]}
+                        </td>
+                        <td
+                          key={Math.random()}
+                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
+                          {row[4]}
+                        </td>
+                        <td
+                          key={Math.random()}
+                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
+                          {row[5]}
+                        </td>
+                        <td
+                          key={Math.random()}
+                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
+                          {row[6]}
+                        </td>
+                        <td
+                          key={Math.random()}
+                          className="py-3.5 pl-4 pr-4 text-center text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
+                          {row[7]}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

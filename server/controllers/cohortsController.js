@@ -18,6 +18,22 @@ router.get("/bookings/:classroom", async (req, res) => {
   const currDate = moment().startOf("day");
   // const currDate = moment("2023-5-20").startOf("day");
 
+  // check for expired bookings and delete
+  // since dates are stored as strings, conversion is needed to compare
+  // const deleteBookings = await Booking.find();
+  // for (const item of deleteBookings) {
+  //   if (currDate.isAfter(item.bookingEnd)) {
+  //     await item.delete();
+  //   }
+  // }
+
+  // const deleteCohorts = await Cohort.find();
+  // for (const item of deleteCohorts) {
+  //   if (currDate.isAfter(item.endDate)) {
+  //     await item.delete();
+  //   }
+  // }
+
   // ignore on Sunday
   if (currDate.day() === 0) {
     return res.json({
